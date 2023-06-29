@@ -8,11 +8,10 @@ import (
 
 	"github.com/iluoy/helm-tool/pkg/option"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
-func NewRootCmd(args []string) *cobra.Command {
-	rootCmd := &cobra.Command{
+var (
+	rootCmd = &cobra.Command{
 		Use:   "helm-tool",
 		Short: "A brief description of your application",
 		Long: `A longer description that spans multiple lines and likely contains
@@ -24,35 +23,29 @@ to quickly create a Cobra application.`,
 		// Uncomment the following line if your bare application
 		// has an action associated with it:
 		// Run: func(cmd *cobra.Command, args []string) { },
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return nil
+		},
 	}
-
-	pflags := rootCmd.PersistentFlags()
-	globalRootOptions := option.GlobalRootOptions{}
-	addFlags(pflags, globalRootOptions)
-	pflags.Parse(args)
-	return rootCmd
-
-}
+	globalRootOptions = option.NewGlobalRootOptions()
+)
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := NewRootCmd(os.Args[1:]).Execute()
+	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func addFlags(pflag *pflag.FlagSet, globalRootOptions option.GlobalRootOptions) {
-	pflag.StringSliceVar(&globalRootOptions.Namespaces, "namespace", []string{}, "all release in specific kubernetes namespaces")
-	pflag.StringSliceVar(&globalRootOptions.Releases, "releases", []string{}, "specific the release name and namespace, i.e: release1.namespace1")
-	pflag.BoolVarP(&globalRootOptions.AllNamespaces, "all-namespaces", "A", false, "all releases in all namespaces")
 }
 
 func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
+	rootCmd.PersistentFlags().StringSliceVar(&globalRootOptions.Namespaces, "namespace", []string{}, "all release in specific kubernetes namespaces")
+	rootCmd.PersistentFlags().StringSliceVar(&globalRootOptions.Releases, "releases", []string{}, "specific the release name and namespace, i.e: release1.namespace1")
+	rootCmd.PersistentFlags().BoolVarP(&globalRootOptions.AllNamespaces, "all-namespaces", "A", false, "all releases in all namespaces")
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.helm-tool.yaml)")
 

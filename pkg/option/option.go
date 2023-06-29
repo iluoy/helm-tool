@@ -10,3 +10,7 @@ type GlobalRootOptions struct {
 	Releases      []string
 	AllNamespaces bool
 }
+
+func NewGlobalRootOptions() GlobalRootOptions {
+	return GlobalRootOptions{}
+}
